@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="453.0" prefWidth="319.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Pane prefHeight="453.0" prefWidth="314.0">
+         <children>
+            <TextField fx:id="customerName" layoutX="45.0" layoutY="100.0" prefHeight="25.0" prefWidth="189.0" />
+            <TextField fx:id="address" layoutX="45.0" layoutY="153.0" prefHeight="25.0" prefWidth="189.0" />
+            <TextField fx:id="postalCode" layoutX="45.0" layoutY="302.0" prefHeight="25.0" prefWidth="117.0" />
+            <TextField fx:id="tfPhone" layoutX="45.0" layoutY="353.0" prefHeight="25.0" prefWidth="189.0" />
+            <Label layoutX="45.0" layoutY="32.0" prefHeight="17.0" prefWidth="108.0" text="%customerId" />
+            <Label layoutX="45.0" layoutY="83.0" prefHeight="17.0" prefWidth="99.0" text="%customerName" />
+            <Label layoutX="45.0" layoutY="136.0" prefHeight="17.0" prefWidth="189.0" text="%address" />
+            <Label layoutX="45.0" layoutY="285.0" prefHeight="17.0" prefWidth="108.0" text="%customerZip" />
+            <Label layoutX="45.0" layoutY="336.0" prefHeight="17.0" prefWidth="189.0" text="%customerPhone" />
+            <TextField fx:id="customerId" disable="true" editable="false" layoutX="45.0" layoutY="49.0" prefHeight="25.0" prefWidth="117.0" promptText="%autoGen" />
+            <ComboBox fx:id="cbDivision" editable="false" layoutX="45.0" layoutY="253.0" prefHeight="25.0" prefWidth="189.0" />
+            <Label layoutX="45.0" layoutY="236.0" prefHeight="17.0" prefWidth="189.0" text="%division" />
+            <ComboBox fx:id="cbCountry" editable="false" layoutX="45.0" layoutY="200.0" prefHeight="25.0" prefWidth="189.0" />
+            <Label layoutX="45.0" layoutY="183.0" prefHeight="17.0" prefWidth="189.0" text="%country" />
+            <Button fx:id="btnSave" layoutX="140.0" layoutY="414.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="82.0" text="%save" />
+            <Button fx:id="btnCancel" layoutX="234.0" layoutY="414.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="75.0" text="%cancel" />
+         </children></Pane>
+   </children>
+</AnchorPane>

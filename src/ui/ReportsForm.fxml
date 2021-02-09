@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.cell.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="515.0" prefWidth="1431.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <ComboBox fx:id="cbType" layoutX="22.0" layoutY="66.0" prefWidth="150.0" />
+      <ComboBox fx:id="cbMonth" layoutX="186.0" layoutY="66.0" prefHeight="25.0" prefWidth="84.0" />
+      <Button fx:id="queryButton" layoutX="284.0" layoutY="66.0" mnemonicParsing="false" text="%query" />
+      <Label fx:id="lblQueryResults" layoutX="21.0" layoutY="119.0" prefHeight="25.0" prefWidth="320.0">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Separator layoutX="347.0" orientation="VERTICAL" prefHeight="515.0" prefWidth="19.0" />
+      <ComboBox fx:id="cbContact" layoutX="366.0" layoutY="28.0" prefWidth="150.0" />
+      <TableView fx:id="tvAppointments" layoutX="366.0" layoutY="83.0" prefHeight="421.0" prefWidth="1052.0">
+         <columns>
+            <TableColumn prefWidth="50.0" text="%id">
+               <cellValueFactory>
+                  <PropertyValueFactory property="Id" />
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn prefWidth="150.0" text="%title">
+               <cellValueFactory>
+                  <PropertyValueFactory property="Title" />
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn prefWidth="200.0" text="%description">
+               <cellValueFactory>
+                  <PropertyValueFactory property="Description" />
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn prefWidth="125.0" text="%location">
+               <cellValueFactory>
+                  <PropertyValueFactory property="Location" />
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="tcContactName" prefWidth="100.0" text="%contact">
+               <cellValueFactory>
+                  <PropertyValueFactory property="Contact" />
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn prefWidth="75.0" text="%type">
+               <cellValueFactory>
+                  <PropertyValueFactory property="Type" />
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn prefWidth="125.0" text="%start">
+               <cellValueFactory>
+                  <PropertyValueFactory property="StartTime" />
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn prefWidth="125.0" text="%end">
+               <cellValueFactory>
+                  <PropertyValueFactory property="EndTime" />
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn prefWidth="100.0" text="%customerId">
+               <cellValueFactory>
+                  <PropertyValueFactory property="CustomerId" />
+               </cellValueFactory>
+            </TableColumn>
+         </columns>
+      </TableView>
+      <Label layoutX="366.0" layoutY="12.0" text="%contact" />
+      <Label layoutX="21.0" layoutY="50.0" text="%type" />
+      <Label layoutX="186.0" layoutY="50.0" text="%month" />
+      <Label layoutX="796.0" layoutY="26.0" prefHeight="34.0" prefWidth="246.0" text="%schedule">
+         <font>
+            <Font size="33.0" />
+         </font>
+      </Label>
+      <ComboBox fx:id="cbDivision" layoutX="22.0" layoutY="270.0" prefWidth="150.0" />
+      <Label layoutX="24.0" layoutY="102.0" text="%total" />
+      <Separator layoutX="14.0" layoutY="194.0" prefHeight="17.0" prefWidth="342.0" />
+      <Label layoutX="46.0" layoutY="6.0" prefHeight="27.0" prefWidth="265.0" text="%appointmentsByTypeAndMonth">
+         <font>
+            <Font size="17.0" />
+         </font>
+      </Label>
+      <Label layoutX="67.0" layoutY="203.0" prefHeight="25.0" prefWidth="255.0" text="%customersByDivision">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <Label layoutX="24.0" layoutY="249.0" text="%division" />
+      <ListView fx:id="lvCustomersByDivision" layoutX="24.0" layoutY="301.0" prefHeight="200.0" prefWidth="320.0" />
+   </children>
+</AnchorPane>

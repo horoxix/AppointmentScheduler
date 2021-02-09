@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="499.0" prefWidth="457.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Pane prefHeight="499.0" prefWidth="457.0">
+         <children>
+            <TextField fx:id="tfAppointmentId" disable="true" editable="false" layoutX="40.0" layoutY="40.0" />
+            <TextField fx:id="tfTitle" layoutX="40.0" layoutY="86.0" prefHeight="25.0" prefWidth="286.0" />
+            <ComboBox fx:id="cbType" layoutX="39.0" layoutY="254.0" prefWidth="150.0" />
+            <TextArea fx:id="taDescription" layoutX="39.0" layoutY="138.0" prefHeight="87.0" prefWidth="374.0" />
+            <DatePicker fx:id="dpStart" layoutX="40.0" layoutY="304.0" editable="false"/>
+            <DatePicker fx:id="dpEnd" layoutX="239.0" layoutY="304.0" editable="false"/>
+            <ComboBox fx:id="cbCustomer" layoutX="41.0" layoutY="415.0" prefHeight="25.0" prefWidth="174.0" />
+            <ComboBox fx:id="cbContact" layoutX="241.0" layoutY="415.0" prefHeight="25.0" prefWidth="174.0" />
+            <Button fx:id="btnSave" layoutX="240.0" layoutY="460.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="87.0" text="%save" />
+            <Button fx:id="btnCancel" layoutX="336.0" layoutY="460.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" text="%cancel" />
+            <Label layoutX="40.0" layoutY="23.0" prefHeight="17.0" prefWidth="87.0" text="%appointmentId" />
+            <Label layoutX="39.0" layoutY="69.0" prefHeight="17.0" prefWidth="286.0" text="%title" />
+            <Label layoutX="39.0" layoutY="121.0" prefHeight="17.0" prefWidth="286.0" text="%description" />
+            <Label layoutX="40.0" layoutY="237.0" text="%type" />
+            <Label layoutX="39.0" layoutY="287.0" text="%startDate" />
+            <Label layoutX="239.0" layoutY="287.0" text="%endDate" />
+            <Label layoutX="41.0" layoutY="398.0" text="%customer" />
+            <Label layoutX="241.0" layoutY="398.0" text="%contact" />
+            <Label layoutX="39.0" layoutY="336.0" text="%startTime" />
+            <Label layoutX="239.0" layoutY="336.0" text="%endTime" />
+            <ComboBox fx:id="cbStartTime" layoutX="39.0" layoutY="353.0" prefHeight="25.0" prefWidth="174.0" />
+            <ComboBox fx:id="cbEndTime" layoutX="240.0" layoutY="353.0" prefHeight="25.0" prefWidth="174.0" />
+            <TextField fx:id="tfLocation" layoutX="239.0" layoutY="254.0" />
+            <Label layoutX="240.0" layoutY="237.0" text="%location" />
+         </children>
+      </Pane>
+   </children>
+</AnchorPane>

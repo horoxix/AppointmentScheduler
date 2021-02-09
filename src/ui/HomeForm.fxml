@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.cell.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="515.0" prefWidth="832.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Pane layoutY="28.0" prefHeight="719.0" prefWidth="1133.0">
+         <children>
+            <TableView fx:id="tvAppointments" layoutX="14.0" layoutY="343.0" prefHeight="319.0" prefWidth="1052.0">
+              <columns>
+                  <TableColumn prefWidth="50.0" text="%id">
+                      <cellValueFactory>
+                          <PropertyValueFactory property="Id" />
+                      </cellValueFactory>
+                  </TableColumn>
+                  <TableColumn prefWidth="150.0" text="%title">
+                      <cellValueFactory>
+                          <PropertyValueFactory property="Title" />
+                      </cellValueFactory>
+                  </TableColumn>
+                  <TableColumn prefWidth="200.0" text="%description">
+                      <cellValueFactory>
+                          <PropertyValueFactory property="Description" />
+                      </cellValueFactory>
+                  </TableColumn>
+                  <TableColumn prefWidth="125.0" text="%location">
+                      <cellValueFactory>
+                          <PropertyValueFactory property="Location" />
+                      </cellValueFactory>
+                  </TableColumn>
+                  <TableColumn fx:id="tcContactName" prefWidth="100.0" text="%contact">
+                      <cellValueFactory>
+                          <PropertyValueFactory property="Contact" />
+                      </cellValueFactory>
+                  </TableColumn>
+                  <TableColumn prefWidth="75.0" text="%type">
+                      <cellValueFactory>
+                          <PropertyValueFactory property="Type" />
+                      </cellValueFactory>
+                  </TableColumn>
+                  <TableColumn prefWidth="125.0" text="%start">
+                      <cellValueFactory>
+                          <PropertyValueFactory property="StartTime" />
+                      </cellValueFactory>
+                  </TableColumn>
+                  <TableColumn prefWidth="125.0" text="%end">
+                      <cellValueFactory>
+                          <PropertyValueFactory property="EndTime" />
+                      </cellValueFactory>
+                  </TableColumn>
+                  <TableColumn prefWidth="100.0" text="%customerId">
+                      <cellValueFactory>
+                          <PropertyValueFactory property="CustomerId" />
+                      </cellValueFactory>
+                  </TableColumn>
+              </columns>
+            </TableView>
+             <RadioButton fx:id="rbAll" layoutX="787.0" layoutY="312.0" mnemonicParsing="false" text="%all">
+                 <toggleGroup>
+                     <ToggleGroup fx:id="appointmentToggleGroup" />
+                 </toggleGroup>
+             </RadioButton>
+             <RadioButton fx:id="rbMonth" layoutX="867.0" layoutY="312.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="96.0" text="%byMonth">
+                 <toggleGroup>
+                     <fx:reference source="appointmentToggleGroup" />
+                 </toggleGroup>
+             </RadioButton>
+             <RadioButton fx:id="rbWeek" layoutX="980.0" layoutY="312.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="87.0" text="%byWeek">
+                 <toggleGroup>
+                     <fx:reference source="appointmentToggleGroup" />
+                 </toggleGroup>
+             </RadioButton>
+            <Button fx:id="btnAddAppointment" layoutX="14.0" layoutY="669.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="120.0" text="%addAppointment" />
+             <Button fx:id="viewReports" layoutX="958.0" layoutY="669.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="108.0" text="%viewReports" />
+            <TableView fx:id="tvCustomers" layoutX="14.0" layoutY="14.0" prefHeight="287.0" prefWidth="752.0">
+              <columns>
+                  <TableColumn prefWidth="50.0" text="%id">
+                      <cellValueFactory>
+                          <PropertyValueFactory property="Id" />
+                      </cellValueFactory>
+                  </TableColumn>
+                  <TableColumn prefWidth="100.0" text="%customerName">
+                      <cellValueFactory>
+                          <PropertyValueFactory property="Name" />
+                      </cellValueFactory>
+                  </TableColumn>
+                  <TableColumn prefWidth="150.0" text="%customerAddress">
+                      <cellValueFactory>
+                          <PropertyValueFactory property="Address" />
+                      </cellValueFactory>
+                  </TableColumn>
+                  <TableColumn prefWidth="75.0" text="%customerZip">
+                      <cellValueFactory>
+                          <PropertyValueFactory property="PostalCode" />
+                      </cellValueFactory>
+                  </TableColumn>
+                  <TableColumn prefWidth="100.0" text="%customerPhone">
+                      <cellValueFactory>
+                          <PropertyValueFactory property="Phone" />
+                      </cellValueFactory>
+                  </TableColumn>
+                  <TableColumn prefWidth="75.0" text="%divisionId">
+                      <cellValueFactory>
+                          <PropertyValueFactory property="DivisionId" />
+                      </cellValueFactory>
+                  </TableColumn>
+                  <TableColumn prefWidth="100.0" text="%divisionName">
+                      <cellValueFactory>
+                          <PropertyValueFactory property="DivisionName" />
+                      </cellValueFactory>
+                  </TableColumn>
+                  <TableColumn prefWidth="100.0" text="%countryName">
+                      <cellValueFactory>
+                          <PropertyValueFactory property="CountryName" />
+                      </cellValueFactory>
+                  </TableColumn>
+              </columns>
+            </TableView>
+            <Button fx:id="btnAddCustomer" layoutX="14.0" layoutY="308.0" mnemonicParsing="false" text="%addCustomer" />
+            <Label layoutX="403.0" layoutY="314.0" prefHeight="17.0" prefWidth="322.0" text="%appointmentsTitle">
+               <font>
+                  <Font size="19.0" />
+               </font>
+            </Label>
+            <ListView fx:id="lvUpcoming" layoutX="787.0" layoutY="39.0" prefHeight="262.0" prefWidth="279.0" />
+            <Label fx:id="lblUpcoming" layoutX="787.0" layoutY="6.0" prefHeight="25.0" prefWidth="279.0" text="%upcomingAppointments">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
+
+         </children>
+      </Pane>
+      <Label layoutX="424.0" layoutY="14.0" prefHeight="28.0" prefWidth="180.0" text="%customersTitle">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>
