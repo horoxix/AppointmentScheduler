@@ -2,7 +2,7 @@ package util;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
+import javafx.scene.control.Label;
 import java.text.DateFormatSymbols;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -57,5 +57,25 @@ public class Helper {
 
     public static ObservableList<String> getMonths() {
         return FXCollections.observableArrayList(dateFormatSymbols.getMonths());
+    }
+
+    /**
+     *
+     * @return A label designed for no search results found.
+     */
+    public static Label getNoResultsLabel(){
+        Label noResultsLabel = new Label();
+        noResultsLabel.setText("No Results");
+        return noResultsLabel;
+    }
+
+    /**
+     *
+     * @return A label designed for no search results found.
+     */
+    public static Label getNoAppointments(){
+        Label noResultsLabel = new Label();
+        noResultsLabel.setText("No Upcoming Appointments");
+        return noResultsLabel;
     }
 }

@@ -46,7 +46,7 @@ public class CustomerDaoImpl implements Dao<Customer> {
      * Gets Customer Object by Customer_ID,
      * or an empty Optional if no results
      * @param id Customer_ID
-     * @return Optional<Customer> object with either the Customer or Empty.
+     * @return Optional object with either the Customer or Empty.
      */
     @Override
     public Optional<Customer> get(int id) {
@@ -67,8 +67,6 @@ public class CustomerDaoImpl implements Dao<Customer> {
                             resultSet.getString("Address"),
                             resultSet.getString("Postal_Code"),
                             resultSet.getString("Phone"),
-                            resultSet.getString("Created_By"),
-                            resultSet.getString("Last_Updated_By"),
                             resultSet.getInt("Division_ID")
                     ));
                 }
@@ -101,8 +99,6 @@ public class CustomerDaoImpl implements Dao<Customer> {
                         resultSet.getString("Address"),
                         resultSet.getString("Postal_Code"),
                         resultSet.getString("Phone"),
-                        resultSet.getString("Created_By"),
-                        resultSet.getString("Last_Updated_By"),
                         resultSet.getInt("Division_ID")
                 );
                 Optional<Division> division = divisionDao.get(customer.getDivisionId());
@@ -130,7 +126,7 @@ public class CustomerDaoImpl implements Dao<Customer> {
     @Override
     public void save(Customer customer) {
         try {
-            String query = "INSERT INTO customers VALUES (?,?,?,?,?,NOW(),?,NOW(),?,;";
+            String query = "INSERT INTO customers VALUES (?,?,?,?,?,NOW(),?,NOW(),?,?);";
             connection = getConnection();
             preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1, customer.getId());
@@ -139,7 +135,8 @@ public class CustomerDaoImpl implements Dao<Customer> {
             preparedStatement.setString(4, customer.getPostalCode());
             preparedStatement.setString(5, customer.getPhone());
             preparedStatement.setString(6, user.getUserName());
-            preparedStatement.setInt(7, customer.getDivisionId());
+            preparedStatement.setString(7, user.getUserName());
+            preparedStatement.setInt(8, customer.getDivisionId());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

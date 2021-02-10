@@ -21,6 +21,7 @@ public class ContactDaoImpl implements Dao<Contact> {
 
     /**
      * Constructor for Contact Dao Impl
+     * @param user current application user
      */
     public ContactDaoImpl(User user) {
         this.user = user;
@@ -43,7 +44,7 @@ public class ContactDaoImpl implements Dao<Contact> {
      * Gets Contact Object by Contact_ID,
      * or an empty Optional if no results
      * @param id Contact_ID
-     * @return Optional<Contact> object with either the Contact or Empty.
+     * @return Optional object with either the Contact or Empty.
      */
     @Override
     public Optional<Contact> get(int id) {

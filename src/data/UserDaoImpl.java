@@ -40,7 +40,7 @@ public class UserDaoImpl implements Dao<User> {
      * Gets User Object by User_ID,
      * or an empty Optional if no results
      * @param id User_ID
-     * @return Optional<User> object with either the User or Empty.
+     * @return Optional object with either the User or Empty.
      */
     @Override
     public Optional<User> get(int id) {
@@ -58,11 +58,7 @@ public class UserDaoImpl implements Dao<User> {
                     return Optional.of(new User(
                             resultSet.getInt("User_ID"),
                             resultSet.getString("User_Name"),
-                            resultSet.getString("Password"),
-                            resultSet.getDate("Create_Date"),
-                            resultSet.getString("Created_By"),
-                            resultSet.getTimestamp("Last_Update"),
-                            resultSet.getString("Last_Updated_By")
+                            resultSet.getString("Password")
                     ));
                 }
             }
@@ -78,7 +74,7 @@ public class UserDaoImpl implements Dao<User> {
      * Gets User Object by User_Name,
      * or an empty Optional if no results
      * @param userName string of the username to get
-     * @return Optional<User> object with either the User or Empty.
+     * @return Optional object with either the User or Empty.
      */
     public Optional<User> getByUsername(String userName) {
         try {
@@ -96,11 +92,7 @@ public class UserDaoImpl implements Dao<User> {
                     return Optional.of(new User(
                             resultSet.getInt("User_ID"),
                             resultSet.getString("User_Name"),
-                            resultSet.getString("Password"),
-                            resultSet.getDate("Create_Date"),
-                            resultSet.getString("Created_By"),
-                            resultSet.getTimestamp("Last_Update"),
-                            resultSet.getString("Last_Updated_By")
+                            resultSet.getString("Password")
                     ));
                 }
             }
@@ -129,11 +121,7 @@ public class UserDaoImpl implements Dao<User> {
                 User user = new User(
                         resultSet.getInt("Id"),
                         resultSet.getString("UserName"),
-                        resultSet.getString("Password"),
-                        resultSet.getDate("CreateDate"),
-                        resultSet.getString("CreatedBy"),
-                        resultSet.getTimestamp("LastUpdate"),
-                        resultSet.getString("LastUpdatedBy")
+                        resultSet.getString("Password")
                 );
                 users.add(user);
             }

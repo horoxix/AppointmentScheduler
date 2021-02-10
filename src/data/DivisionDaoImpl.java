@@ -47,7 +47,7 @@ public class DivisionDaoImpl implements Dao<Division> {
      * Gets Division Object by Division_ID,
      * or an empty Optional if no results
      * @param id Division_ID
-     * @return Optional<Division> object with either the Division or Empty.
+     * @return Optional object with either the Division or Empty.
      */
     @Override
     public Optional<Division> get(int id) {
@@ -65,10 +65,6 @@ public class DivisionDaoImpl implements Dao<Division> {
                     Division division = new Division(
                             resultSet.getInt("Division_ID"),
                             resultSet.getString("Division"),
-                            resultSet.getDate("Create_Date"),
-                            resultSet.getString("Created_By"),
-                            resultSet.getTimestamp("Last_Update"),
-                            resultSet.getString("Last_Updated_By"),
                             resultSet.getInt("Country_ID")
                     );
 
@@ -106,10 +102,6 @@ public class DivisionDaoImpl implements Dao<Division> {
                 Division division = new Division(
                         resultSet.getInt("Division_ID"),
                         resultSet.getString("Division"),
-                        resultSet.getDate("Create_Date"),
-                        resultSet.getString("Created_By"),
-                        resultSet.getTimestamp("Last_Update"),
-                        resultSet.getString("Last_Updated_By"),
                         resultSet.getInt("Country_ID")
                 );
 

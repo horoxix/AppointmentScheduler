@@ -13,17 +13,17 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import util.Helper;
-
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Optional;
+import java.util.ResourceBundle;
 
 import static biz.TimeService.timeFormatter;
 
 public class ModifyAppointmentController {
     private final Appointment appointment;
     private final ObservableList<Appointment> appointments;
-    private final User user;
+    private ResourceBundle bundle;
     private Scene scene;
     private final Dao<Appointment> appointmentDao;
     private final Dao<Customer> customerDao;
@@ -69,12 +69,16 @@ public class ModifyAppointmentController {
     @FXML
     private TextField tfLocation;
 
-
+    /**
+     * Constructor, creates the Modify Appointment Controller
+     * @param appointment the current appointment to modify
+     * @param user the current App User
+     * @param appointments the current List of Appointments
+     */
     public ModifyAppointmentController(Appointment appointment, User user, ObservableList<Appointment> appointments){
-        // Initialize Modifying Appointment
+        // Initialize appointments
         this.appointment = appointment;
         this.appointments = appointments;
-        this.user = user;
 
         // Initialize Data Access Objects
         appointmentDao = new AppointmentDaoImpl(user);
@@ -82,7 +86,12 @@ public class ModifyAppointmentController {
         contactDao = new ContactDaoImpl(user);
     }
 
+    /**
+     * Initialize Method, called after constructor
+     */
     public void initialize(){
+        bundle = ResourceBundle.getBundle("resources.UIResources");
+
         // Initialize combo box lists
         cbStartTime.setItems(Helper.getTimes());
         cbEndTime.setItems(Helper.getTimes());
@@ -120,6 +129,13 @@ public class ModifyAppointmentController {
 
         customer.ifPresent(value -> cbCustomer.getSelectionModel().select(value));
 
+        initializeBindings();
+    }
+
+    /**
+     * Initializes button/ui bindings.
+     */
+    private void initializeBindings(){
         // Initialize Bindings and Actions
         btnSave.setOnAction((event -> {
             try {
@@ -156,18 +172,28 @@ public class ModifyAppointmentController {
         });
     }
 
+    /**
+     * Handles the Save Button click, Checks for invalid state
+     * and then, if valid, saves to the database.
+     * @param event Button Click Event
+     * @throws Exception possible exception thrown
+     */
     @FXML
     protected void handleSaveButton(ActionEvent event) throws Exception {
         try {
+            // Verify all input information is valid before attempting to save.
             StringBuilder sb = verifySave();
+
+            // If invalid, display error alert.
             if(sb.length() > 0)
             {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Modify Customer Warning");
-                alert.setHeaderText("Please complete all fields.");
+                alert.setTitle(bundle.getString("warning"));
+                alert.setHeaderText(bundle.getString("completeFields"));
                 alert.setContentText(sb.toString());
                 alert.showAndWait();
             }
+            // If valid, save to database
             else {
                 if (!invalidSaveState) {
                     appointment.setTitle(tfTitle.getText());
@@ -186,8 +212,8 @@ public class ModifyAppointmentController {
                     closeWindow();
                 } else {
                     Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.setTitle("Modify Customer Warning");
-                    alert.setHeaderText("Please resolve any error messages.");
+                    alert.setTitle(bundle.getString("warning"));
+                    alert.setHeaderText(bundle.getString("resolveErrors"));
                     alert.setContentText(sb.toString());
                     alert.showAndWait();
                 }
@@ -223,35 +249,39 @@ public class ModifyAppointmentController {
     private StringBuilder verifySave(){
         StringBuilder errorList = new StringBuilder();
         if(invalidTitle()){
-            errorList.append(" - Please enter a title.\n");
+            errorList.append(bundle.getString("invalidTitle")).append("\n");
         }
 
         if(invalidDescription()){
-            errorList.append(" - Please enter a description.\n");
+            errorList.append(bundle.getString("invalidDescription")).append("\n");
         }
 
         if(invalidType()){
-            errorList.append(" - Please select a valid Type.\n");
+            errorList.append(bundle.getString("invalidType")).append("\n");
         }
 
         if(invalidDateTime()){
-            errorList.append(" - Please enter a valid Date and Time combination.\n");
+            errorList.append(bundle.getString("invalidDateTime")).append("\n");
+        }
+
+        if(invalidLocation()){
+            errorList.append(bundle.getString("invalidLocation")).append("\n");
         }
 
         if(invalidCustomer()){
-            errorList.append(" - Please select a Customer.\n");
+            errorList.append(bundle.getString("invalidCustomer")).append("\n");
         }
 
         if(invalidContact()){
-            errorList.append(" - Please select a Contact.\n");
+            errorList.append(bundle.getString("invalidContact")).append("\n");
         }
 
         if(invalidBusinessHours()){
-            errorList.append(" - Start and End date/time must be within business hours of 8:00 AM - 10:00 PM EST.");
+            errorList.append(bundle.getString("invalidBusinessHours")).append("\n");
         }
 
         if(appointmentHasConflict()){
-            errorList.append(" - Appointment Start and End date/time conflict with an existing appointment.");
+            errorList.append(bundle.getString("appointmentConflict")).append("\n");
         }
         return errorList;
     }
@@ -270,6 +300,14 @@ public class ModifyAppointmentController {
      */
     private boolean invalidTitle(){
         return tfTitle.getText().isEmpty();
+    }
+
+    /**
+     * Is the location invalid?
+     * @return true if invalid
+     */
+    private boolean invalidLocation(){
+        return tfLocation.getText().isEmpty();
     }
 
     /**

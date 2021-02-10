@@ -15,7 +15,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import util.Helper;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -60,6 +63,10 @@ public class HomeController {
     @FXML
     private Button viewReports;
 
+    /**
+     * Constructor, creates the Home Controller
+     * @param user the current App User
+     */
     public HomeController(User user){
         this.user = user;
         upcomingAppointments = FXCollections.observableArrayList();
@@ -67,30 +74,58 @@ public class HomeController {
         customerDao = new CustomerDaoImpl(user);
     }
 
-    private void initializeAppointments()
-    {
-        appointments = appointmentDao.getAll();
-        loadAppointments();
-    }
-
-    private void loadCustomers()
-    {
-        customers = customerDao.getAll();
-        tvCustomers.setItems(customers);
-    }
-
+    /**
+     * Initialize Method, called after constructor
+     */
     @FXML
     public void initialize() {
         bundle = ResourceBundle.getBundle("resources.UIResources");
+
+        tvCustomers.setPlaceholder(Helper.getNoResultsLabel());
+        tvAppointments.setPlaceholder(Helper.getNoResultsLabel());
+        lvUpcoming.setPlaceholder(Helper.getNoAppointments());
 
         rbAll.setSelected(true);
         initializeAppointments();
         loadCustomers();
 
+        initializeBindings();
+    }
+
+    /**
+     * Initializes button/ui bindings.
+     */
+    private void initializeBindings(){
         MenuItem deleteMenuItem = new MenuItem(bundle.getString("delete"));
         MenuItem updateMenuItem = new MenuItem(bundle.getString("update"));
         MenuItem deleteCustomerMenuItem = new MenuItem(bundle.getString("delete"));
         MenuItem updateCustomerMenuItem = new MenuItem(bundle.getString("update"));
+
+        ContextMenu menu = new ContextMenu();
+        menu.getItems().add(deleteMenuItem);
+        menu.getItems().add(updateMenuItem);
+        tvAppointments.setContextMenu(menu);
+
+        ContextMenu customerMenu = new ContextMenu();
+        customerMenu.getItems().add(deleteCustomerMenuItem);
+        customerMenu.getItems().add(updateCustomerMenuItem);
+        tvCustomers.setContextMenu(customerMenu);
+
+        btnAddAppointment.setOnAction(event -> {
+            try {
+                handleAddAppointmentAction(event);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        btnAddCustomer.setOnAction(event -> {
+            try {
+                handleAddCustomerAction(event);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
 
         deleteMenuItem.setOnAction((ActionEvent event) -> {
             try {
@@ -118,7 +153,11 @@ public class HomeController {
         }));
 
         deleteCustomerMenuItem.setOnAction((ActionEvent event) -> {
-            Object item = tvAppointments.getSelectionModel().getSelectedItem();
+            try {
+                handleDeleteCustomerAction(event);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
 
         updateCustomerMenuItem.setOnAction((event -> {
@@ -152,40 +191,94 @@ public class HomeController {
                 e.printStackTrace();
             }
         }));
-
-        ContextMenu menu = new ContextMenu();
-        menu.getItems().add(deleteMenuItem);
-        menu.getItems().add(updateMenuItem);
-        tvAppointments.setContextMenu(menu);
-
-        ContextMenu customerMenu = new ContextMenu();
-        customerMenu.getItems().add(deleteCustomerMenuItem);
-        customerMenu.getItems().add(updateCustomerMenuItem);
-        tvCustomers.setContextMenu(customerMenu);
-
-        btnAddAppointment.setOnAction(event -> {
-            try {
-                handleAddAppointmentAction(event);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-
-        btnAddCustomer.setOnAction(event -> {
-            try {
-                handleAddCustomerAction(event);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
     }
 
+    /**
+     * Initializes appointment list
+     * Calls loadAppointments to get based on all, monthly, or weekly
+     */
+    private void initializeAppointments()
+    {
+        appointments = appointmentDao.getAll();
+        loadAppointments();
+    }
+
+    /**
+     * Initializes and loads customer list
+     */
+    private void loadCustomers()
+    {
+        customers = customerDao.getAll();
+        tvCustomers.setItems(customers);
+    }
+
+    /**
+     * On radio button selected, determines which information to display based on Part instance type
+     * @param event action event of button click
+     * @throws Exception possible Exception thrown
+     */
+    @FXML
+    protected void handleRadioButtonSelected(ActionEvent event) throws Exception {
+        loadAppointments();
+    }
+
+    /**
+     * Checks to see which radio button option is selected.
+     * if all, load all appointments
+     * if monthly, load for current month
+     * if weekly, load for current week
+     */
+    private void loadAppointments(){
+        if(rbAll.isSelected()){
+            loadAllAppointments();
+        }
+        else if (rbMonth.isSelected()){
+            loadMonthlyAppointments();
+        }
+        else {
+            loadWeeklyAppointments();
+        }
+    }
+
+    /**
+     * Sets all appointments to table view
+     */
+    private void loadAllAppointments(){
+        tvAppointments.setItems(appointments);
+    }
+
+    /**
+     * Sets appointments taking place in the current month to table view
+     * Using lambda in the filter method to compare each appointment start time with the current month
+     */
+    private void loadMonthlyAppointments(){
+        tvAppointments.setItems(appointments
+                .stream()
+                .filter(app -> (TimeService.isCurrentMonth(TimeService.convertToZonedDateTime(app.getStartTime()))))
+                .collect(Collectors.toCollection(FXCollections::observableArrayList)));
+    }
+
+    /**
+     * Sets appointments taking place in current week to table view
+     * Using lambda in the filter method to compare each appointment start time with the current week
+     */
+    private void loadWeeklyAppointments(){
+        tvAppointments.setItems(appointments
+                .stream()
+                .filter(app -> (TimeService.isCurrentWeek(TimeService.convertToZonedDateTime(app.getStartTime()))))
+                .collect(Collectors.toCollection(FXCollections::observableArrayList)));
+    }
+
+    /**
+     * Checks for upcoming appointments in the next 15 minutes
+     * If found, displays a pop up message and adds them to the UI for upcoming appointments.
+     * If not found, displays a pop up message saying "No Upcoming Appointments"
+     */
     public void checkForUpcomingAppointments(){
         StringBuilder sb = new StringBuilder();
         for(Appointment app : appointments){
-            if(TimeService.convertToZonedDateTime(app.getStartTime())
-                    .isAfter(ZonedDateTime.now()) && TimeService.convertToZonedDateTime(app.getStartTime())
-                    .isBefore(TimeService.convertToZonedDateTime(app.getStartTime()).plusMinutes(15))){
+            ZonedDateTime zd = TimeService.convertToZonedDateTime(app.getStartTime());
+            if(zd.isAfter(ZonedDateTime.now()) && zd.isBefore(ZonedDateTime.now().plusMinutes(15))){
                 upcomingAppointments.add(app);
                 sb.append(app.getId())
                         .append(" - ")
@@ -219,11 +312,17 @@ public class HomeController {
         }
         else {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setContentText("There are no upcoming appointments.");
+            alert.setContentText(bundle.getString("noUpcomingAppointments"));
             alert.show();
         }
     }
 
+    /**
+     * Handles the Add Appointment Button click
+     * Opens the Add Appointment form
+     * @param event Button Click Event
+     * @throws Exception possible exception thrown
+     */
     @FXML
     protected void handleAddAppointmentAction(ActionEvent event) throws Exception {
         try {
@@ -246,6 +345,13 @@ public class HomeController {
             ex.printStackTrace();
         }
     }
+
+    /**
+     * Handles the Add Customer Button click
+     * Opens the Add Customer form
+     * @param event Button Click Event
+     * @throws Exception possible exception thrown
+     */
     @FXML
     protected void handleAddCustomerAction(ActionEvent event) throws Exception {
         try {
@@ -270,6 +376,12 @@ public class HomeController {
         }
     }
 
+    /**
+     * Handles the Update Customer Menu Item click
+     * Opens the Update Customer form
+     * @param event Button Click Event
+     * @throws Exception possible exception thrown
+     */
     @FXML
     protected void handleUpdateCustomerAction(ActionEvent event) throws Exception {
         try {
@@ -301,6 +413,12 @@ public class HomeController {
         }
     }
 
+    /**
+     * Handles the Update Appointment Menu Item click
+     * Opens the Update Appointment form if valid appointment is selected
+     * @param event Button Click Event
+     * @throws Exception possible exception thrown
+     */
     @FXML
     protected void handleUpdateAppointmentAction(ActionEvent event) throws Exception {
         try {
@@ -332,6 +450,69 @@ public class HomeController {
         }
     }
 
+    /**
+     * Handles the Delete Customer Menu Item click
+     * Confirms deletion.
+     * If Yes, deletes customer from DB and UI
+     * Deletes associated Appointments
+     * If No, cancels and returns
+     * Using lambda in forEach again to neatly, and in an organized
+     * manner loop through the appointments
+     * @param event Button Click Event
+     * @throws Exception possible exception thrown
+     */
+    private void handleDeleteCustomerAction(ActionEvent event) throws Exception {
+        try {
+            Customer customer = tvCustomers.getSelectionModel().getSelectedItem();
+            if(customer == null){
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setContentText(bundle.getString("selectCustomerErrorMessage"));
+                alert.show();
+            }
+            else {
+                Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION,
+                        bundle.getString("delete") + " " + customer.getName() + "? " + bundle.getString("deleteConfirmation"),
+                        ButtonType.YES,
+                        ButtonType.NO,
+                        ButtonType.CANCEL);
+
+
+                confirmationAlert.showAndWait();
+                if(confirmationAlert.getResult() == ButtonType.YES){
+                    List<Appointment> deletionQueue = new ArrayList<>();
+                    appointments.forEach((app) -> {
+                        if(app.getCustomerId() == customer.getId()){
+                            appointmentDao.delete(app);
+                            deletionQueue.add(app);
+                        }
+                    });
+
+                    if(deletionQueue.size() > 0){
+                        deletionQueue.forEach((app)-> {
+                            appointments.remove(app);
+                        });
+                    }
+
+                    customerDao.delete(customer);
+                    customers.remove(customer);
+
+                    tvCustomers.refresh();
+                }
+            }
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Handles the Delete Appointment Menu Item click
+     * Confirms deletion.
+     * If Yes, deletes appointment from DB and UI
+     * If No, cancels and returns
+     * @param event Button Click Event
+     * @throws Exception possible exception thrown
+     */
     private void handleDeleteAppointmentAction(ActionEvent event) throws Exception {
         try {
             Appointment appointment = tvAppointments.getSelectionModel().getSelectedItem();
@@ -342,7 +523,7 @@ public class HomeController {
             }
             else {
                 Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION,
-                        "Delete " + appointment.getTitle() + "?",
+                        bundle.getString("delete") + " " + appointment.getTitle() + "?",
                         ButtonType.YES,
                         ButtonType.NO,
                         ButtonType.CANCEL);
@@ -351,6 +532,13 @@ public class HomeController {
                 if(confirmationAlert.getResult() == ButtonType.YES){
                     appointmentDao.delete(appointment);
                     appointments.remove(appointment);
+                    if(upcomingAppointments.contains(appointment)){
+                        upcomingAppointments.remove(appointment);
+                        if(upcomingAppointments.size() < 1){
+                            lblUpcoming.setStyle("-fx-text-fill: black ;");
+                        }
+                    }
+
                     tvAppointments.refresh();
                 }
             }
@@ -360,6 +548,12 @@ public class HomeController {
         }
     }
 
+    /**
+     * Handles the View Reports Button click
+     * Opens the View Reports form
+     * @param event Button Click Event
+     * @throws Exception possible exception thrown
+     */
     @FXML
     protected void handleViewReportsAction(ActionEvent event) throws Exception {
         try {
@@ -391,44 +585,4 @@ public class HomeController {
     public void setScene(Scene scene) {
         this.scene = scene;
     };
-
-    /**
-     * On radio button selected, determines which information to display based on Part instance type
-     * @param event action event of button click
-     * @throws Exception possible Exception thrown
-     */
-    @FXML
-    protected void handleRadioButtonSelected(ActionEvent event) throws Exception {
-        loadAppointments();
-    }
-
-    private void loadAppointments(){
-        if(rbAll.isSelected()){
-            loadAllAppointments();
-        }
-        else if (rbMonth.isSelected()){
-            loadMonthlyAppointments();
-        }
-        else {
-            loadWeeklyAppointments();
-        }
-    }
-
-    private void loadAllAppointments(){
-        tvAppointments.setItems(appointments);
-    }
-
-    private void loadMonthlyAppointments(){
-        tvAppointments.setItems(appointments
-                .stream()
-                .filter(app -> (TimeService.isCurrentMonth(TimeService.convertToZonedDateTime(app.getStartTime()))))
-                .collect(Collectors.toCollection(FXCollections::observableArrayList)));
-    }
-
-    private void loadWeeklyAppointments(){
-        tvAppointments.setItems(appointments
-                .stream()
-                .filter(app -> (TimeService.isCurrentWeek(TimeService.convertToZonedDateTime(app.getStartTime()))))
-                .collect(Collectors.toCollection(FXCollections::observableArrayList)));
-    }
 }

@@ -21,6 +21,7 @@ public class CountryDaoImpl implements Dao<Country> {
 
     /**
      * Constructor for Country Dao Impl
+     * @param user current application user
      */
     public CountryDaoImpl(User user) {
         this.user = user;
@@ -43,7 +44,7 @@ public class CountryDaoImpl implements Dao<Country> {
      * Gets Country Object by Country_ID,
      * or an empty Optional if no results
      * @param id Country_ID
-     * @return Optional<Country> object with either the Country or Empty.
+     * @return Optional object with either the Country or Empty.
      */
     @Override
     public Optional<Country> get(int id) {
@@ -60,11 +61,7 @@ public class CountryDaoImpl implements Dao<Country> {
                 if(resultSet.next()){
                     return Optional.of(new Country(
                             resultSet.getInt("Country_ID"),
-                            resultSet.getString("Country"),
-                            resultSet.getDate("Create_Date"),
-                            resultSet.getString("Created_By"),
-                            resultSet.getTimestamp("Last_Update"),
-                            resultSet.getString("Last_Updated_By")
+                            resultSet.getString("Country")
                     ));
                 }
             }
@@ -93,11 +90,7 @@ public class CountryDaoImpl implements Dao<Country> {
                 {
                     Country country = new Country(
                             resultSet.getInt("Country_ID"),
-                            resultSet.getString("Country"),
-                            resultSet.getDate("Create_Date"),
-                            resultSet.getString("Created_By"),
-                            resultSet.getTimestamp("Last_Update"),
-                            resultSet.getString("Last_Updated_By")
+                            resultSet.getString("Country")
                     );
 
                     countries.add(country);

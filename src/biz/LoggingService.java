@@ -9,6 +9,10 @@ public class LoggingService {
     public static FileHandler fileHandler;
     private static final String logFile = " login_activity.txt";
 
+    /**
+     * Logs info string to login_activity.txt file
+     * @param logText the string to log to the file
+     */
     public static void LogInfo(String logText){
         try{
             if(logger == null){

@@ -17,15 +17,16 @@ import util.Helper;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Optional;
+import java.util.ResourceBundle;
 
 public class AddAppointmentController {
-    private Scene scene;
+    private ResourceBundle bundle;
     private final ObservableList<Appointment> appointments;
     private final Dao<Appointment> appointmentDao;
     private final Dao<Customer> customerDao;
     private final Dao<Contact> contactDao;
     private boolean invalidSaveState;
-    private final User user;
+    private Scene scene;
 
     @FXML
     private TextField tfAppointmentId;
@@ -72,8 +73,7 @@ public class AddAppointmentController {
      * @param appointments the current List of Appointments
      */
     public AddAppointmentController(User user, ObservableList<Appointment> appointments){
-        // Initialize user
-        this.user = user;
+        // Initialize appointments
         this.appointments = appointments;
 
         // Initialize Data Access Objects
@@ -93,6 +93,8 @@ public class AddAppointmentController {
         cbType.setItems(Helper.getAppointmentTypes());
         cbCustomer.setItems(customerDao.getAll());
         cbContact.setItems(contactDao.getAll());
+
+        bundle = ResourceBundle.getBundle("resources.UIResources");
 
         initializeBindings();
     }
@@ -154,8 +156,8 @@ public class AddAppointmentController {
             if(sb.length() > 0)
             {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Modify Customer Warning");
-                alert.setHeaderText("Please complete all fields.");
+                alert.setTitle(bundle.getString("warning"));
+                alert.setHeaderText(bundle.getString("completeFields"));
                 alert.setContentText(sb.toString());
                 alert.showAndWait();
             }
@@ -186,8 +188,8 @@ public class AddAppointmentController {
                     closeWindow();
                 } else {
                     Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.setTitle("Modify Customer Warning");
-                    alert.setHeaderText("Please resolve any error messages.");
+                    alert.setTitle(bundle.getString("warning"));
+                    alert.setHeaderText(bundle.getString("resolveErrors"));
                     alert.setContentText(sb.toString());
                     alert.showAndWait();
                 }
@@ -223,35 +225,39 @@ public class AddAppointmentController {
     private StringBuilder verifySave(){
         StringBuilder errorList = new StringBuilder();
         if(invalidTitle()){
-            errorList.append(" - Please enter a title.\n");
+            errorList.append(bundle.getString("invalidTitle")).append("\n");
         }
 
         if(invalidDescription()){
-            errorList.append(" - Please enter a description.\n");
+            errorList.append(bundle.getString("invalidDescription")).append("\n");
         }
 
         if(invalidType()){
-            errorList.append(" - Please select a valid Type.\n");
+            errorList.append(bundle.getString("invalidType")).append("\n");
         }
 
         if(invalidDateTime()){
-            errorList.append(" - Please enter a valid Date and Time combination.\n");
+            errorList.append(bundle.getString("invalidDateTime")).append("\n");
+        }
+
+        if(invalidLocation()){
+            errorList.append(bundle.getString("invalidLocation")).append("\n");
         }
 
         if(invalidCustomer()){
-            errorList.append(" - Please select a Customer.\n");
+            errorList.append(bundle.getString("invalidCustomer")).append("\n");
         }
 
         if(invalidContact()){
-            errorList.append(" - Please select a Contact.\n");
+            errorList.append(bundle.getString("invalidContact")).append("\n");
         }
 
         if(invalidBusinessHours()){
-            errorList.append(" - Start and End date/time must be within business hours of 8:00 AM - 10:00 PM EST.");
+            errorList.append(bundle.getString("invalidBusinessHours")).append("\n");
         }
 
         if(appointmentHasConflict()){
-            errorList.append(" - Appointment Start and End date/time conflict with an existing appointment.");
+            errorList.append(bundle.getString("appointmentConflict")).append("\n");
         }
         return errorList;
     }
@@ -270,6 +276,14 @@ public class AddAppointmentController {
      */
     private boolean invalidTitle(){
         return tfTitle.getText().isEmpty();
+    }
+
+    /**
+     * Is the location invalid?
+     * @return true if invalid
+     */
+    private boolean invalidLocation(){
+        return tfLocation.getText().isEmpty();
     }
 
     /**
@@ -339,15 +353,24 @@ public class AddAppointmentController {
      */
     private boolean appointmentHasConflict(){
         for(Appointment app : appointments){
+
             ZonedDateTime startTime = TimeService.convertToBusinessHoursZonedDateTime(app.getStartTime());
             ZonedDateTime endTime = TimeService.convertToBusinessHoursZonedDateTime(app.getEndTime());
             ZonedDateTime newStartTime = TimeService.convertToBusinessHoursZonedDateTime(dpStart.getValue(), cbStartTime.getValue());
             ZonedDateTime newEndTime = TimeService.convertToBusinessHoursZonedDateTime(dpEnd.getValue(), cbEndTime.getValue());
 
-            if(newStartTime.isAfter(startTime) && newStartTime.isBefore(endTime)
-            || newEndTime.isBefore(endTime) && newEndTime.isAfter(startTime)){
-                return true;
+            boolean strt = false;
+            boolean end = false;
+
+            if ((newStartTime.isAfter(startTime) || newStartTime.isEqual(startTime)) && (newStartTime.isBefore(endTime) || newStartTime.isEqual(endTime))){
+                strt = true;
             }
+
+            if ((newEndTime.isAfter(startTime) || newEndTime.isEqual(startTime)) && (newEndTime.isBefore(endTime) || newEndTime.isEqual(endTime))){
+                end = true;
+            }
+
+            return strt && end;
         }
         return false;
     }

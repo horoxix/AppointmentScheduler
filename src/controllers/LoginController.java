@@ -11,12 +11,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-
 import java.time.ZoneId;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.logging.FileHandler;
-import java.util.logging.Logger;
 
 public class LoginController
 {
@@ -45,15 +42,28 @@ public class LoginController
     @FXML
     private Button btnCancel;
 
+    /**
+     * Constructor, creates theLogin Controller
+     */
     public LoginController(){
         userDao = new UserDaoImpl();
     }
 
+    /**
+     * Initialize Method, called after constructor
+     */
     @FXML
     public void initialize(){
         bundle = ResourceBundle.getBundle("resources.UIResources");
         lblLocation.setText(ZoneId.systemDefault().toString());
 
+        initializeBindings();
+    }
+
+    /**
+     * Initializes button/ui bindings.
+     */
+    private void initializeBindings(){
         btnOk.setOnAction((event -> {
             try {
                 handleOkButtonAction(event);
@@ -80,7 +90,9 @@ public class LoginController
     };
 
     /**
-     * On cancel button click, closes window
+     * On OK button action, verifies login
+     * If successful, logs in. Writes successful log
+     * If failure, displays message. Writes failure log
      * @param event action event of button click
      * @throws Exception possible Exception thrown
      */

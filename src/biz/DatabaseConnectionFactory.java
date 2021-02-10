@@ -10,6 +10,9 @@ public class DatabaseConnectionFactory {
 
     private static DatabaseConnectionFactory connectionFactory = null;
 
+    /**
+     * Constructor, creates the Database Connection Factory
+     */
     private DatabaseConnectionFactory() {
         try {
             Class.forName(className);
@@ -18,12 +21,21 @@ public class DatabaseConnectionFactory {
         }
     }
 
+    /**
+     * Gets connection from database connection factory
+     * @return Connection object
+     * @throws SQLException thrown if connection info invalid
+     */
     public Connection getConnection() throws SQLException {
         Connection conn = null;
         conn = DriverManager.getConnection(connectionUrl, dbUserName, dbPassword);
         return conn;
     }
 
+    /**
+     * Returns instance of database connection factory
+     * @return DatabaseConnectionFactory instance object
+     */
     public static DatabaseConnectionFactory getInstance() {
         if (connectionFactory == null) {
             connectionFactory = new DatabaseConnectionFactory();
@@ -31,6 +43,13 @@ public class DatabaseConnectionFactory {
         return connectionFactory;
     }
 
+    /**
+     * Gets the next available primary key ID for table and column
+     * @param tableColumn the columnName of the primary key id
+     * @param tableName the tableName of the table
+     * @return int of next available primary key
+     * @throws SQLException thrown if invalid sql connection
+     */
     public static int getNextAvailableId(String tableColumn, String tableName) throws SQLException{
         String query = "SELECT MAX(" + tableColumn + ") FROM " + tableName;
         Connection conn;

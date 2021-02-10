@@ -126,7 +126,7 @@
                </font>
             </Label>
             <ListView fx:id="lvUpcoming" layoutX="787.0" layoutY="39.0" prefHeight="262.0" prefWidth="279.0" />
-            <Label fx:id="lblUpcoming" layoutX="787.0" layoutY="6.0" prefHeight="25.0" prefWidth="279.0" text="%upcomingAppointments">
+            <Label fx:id="lblUpcoming" layoutX="837.0" layoutY="2.0" prefHeight="25.0" prefWidth="180.0" text="%upcomingAppointments">
                <font>
                   <Font size="15.0" />
                </font>

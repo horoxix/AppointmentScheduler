@@ -45,7 +45,7 @@ public class AppointmentDaoImpl implements Dao<Appointment> {
      * Gets Appointment Object by Appointment_ID,
      * or an empty Optional if no results
      * @param id Appointment_ID
-     * @return Optional<Appointment> object with either the Appointment or Empty.
+     * @return Optional object with either the Appointment or Empty.
      */
     @Override
     public Optional<Appointment> get(int id){

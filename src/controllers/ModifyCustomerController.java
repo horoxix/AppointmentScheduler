@@ -1,5 +1,6 @@
 package controllers;
 
+import data.Dao;
 import models.Country;
 import models.Customer;
 import models.Division;
@@ -19,16 +20,18 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 public class ModifyCustomerController {
     private final Customer customer;
     private Scene scene;
+    private ResourceBundle bundle;
     private ObservableList<Country> countries;
     private ObservableList<Division> divisions;
-    private final CustomerDaoImpl customerDao;
-    private final CountryDaoImpl countryDao;
-    private final DivisionDaoImpl divisionDao;
+    private final Dao<Customer> customerDao;
+    private final Dao<Country> countryDao;
+    private final Dao<Division> divisionDao;
     private boolean invalidSaveState;
 
     @FXML
@@ -58,7 +61,11 @@ public class ModifyCustomerController {
     @FXML
     private Button btnCancel;
 
-
+    /**
+     * Constructor, creates the Modify Customer Controller
+     * @param customer the selected customer to modify
+     * @param user the current App User
+     */
     public ModifyCustomerController(Customer customer, User user){
         // Initialize user and customer list
         this.customer = customer;
@@ -71,7 +78,12 @@ public class ModifyCustomerController {
         customerDao = new CustomerDaoImpl(user);
     }
 
+    /**
+     * Initialize Method, called after constructor
+     */
     public void initialize(){
+        bundle = ResourceBundle.getBundle("resources.UIResources");
+
         countries = countryDao.getAll();
         divisions = divisionDao.getAll();
 
@@ -109,6 +121,13 @@ public class ModifyCustomerController {
 
         oc.ifPresent(country -> cbCountry.getSelectionModel().select(country));
 
+        initializeBindings();
+    }
+
+    /**
+     * Initializes button/ui bindings.
+     */
+    private void initializeBindings(){
         // Initialize Bindings and Actions
         btnSave.setOnAction((event -> {
             try {
@@ -127,27 +146,50 @@ public class ModifyCustomerController {
         }));
     }
 
+    /**
+     * Handles when country combo box value is changed
+     * Updates Divisions with appropriate options
+     * @param country new country that combo box has changed to
+     */
     private void handleCountryChange(Country country){
-        cbDivision.setItems(divisions
+        ObservableList<Division> filteredDivisionList = divisions
                 .stream()
                 .filter(division -> (division.getCountryId() == (country.getId())))
-                .collect(Collectors.toCollection(FXCollections::observableArrayList)));
-
-        cbDivision.getSelectionModel().select(0);
+                .collect(Collectors.toCollection(FXCollections::observableArrayList));
+        // if results, enable combo box and set division items
+        if(filteredDivisionList.size() > 0){
+            cbDivision.setDisable(false);
+            cbDivision.setItems(filteredDivisionList);
+            cbDivision.getSelectionModel().select(0);
+        }
+        // if no results, disable division combo box
+        else {
+            cbDivision.setDisable(true);
+        }
     }
 
+    /**
+     * Handles the Save Button click, Checks for invalid state
+     * and then, if valid, saves to the database.
+     * @param event Button Click Event
+     * @throws Exception possible exception thrown
+     */
     @FXML
     protected void handleSaveButton(ActionEvent event) throws Exception {
         try {
+            // Verify all input information is valid before attempting to save.
             StringBuilder sb = verifySave();
+
+            // If invalid, display error alert.
             if(sb.length() > 0)
             {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Modify Customer Warning");
-                alert.setHeaderText("Please complete all fields.");
+                alert.setTitle(bundle.getString("warning"));
+                alert.setHeaderText(bundle.getString("completeFields"));
                 alert.setContentText(sb.toString());
                 alert.showAndWait();
             }
+            // If valid, save to database
             else {
                 if (!invalidSaveState) {
                     customer.setName(customerName.getText());
@@ -159,8 +201,8 @@ public class ModifyCustomerController {
                     closeWindow();
                 } else {
                     Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.setTitle("Modify Customer Warning");
-                    alert.setHeaderText("Please resolve any error messages.");
+                    alert.setTitle(bundle.getString("warning"));
+                    alert.setHeaderText(bundle.getString("resolveErrors"));
                     alert.setContentText(sb.toString());
                     alert.showAndWait();
                 }
@@ -196,27 +238,27 @@ public class ModifyCustomerController {
     private StringBuilder verifySave(){
         StringBuilder errorList = new StringBuilder();
         if(invalidName()){
-            errorList.append(" - Please enter a valid Name.\n");
+            errorList.append(bundle.getString("invalidName")).append("\n");
         }
 
         if(invalidAddress()){
-            errorList.append(" - Please enter a valid Address.\n");
+            errorList.append(bundle.getString("invalidAddress")).append("\n");
         }
 
         if(invalidPhoneNumber()){
-            errorList.append(" - Please enter a valid Phone Number.\n");
+            errorList.append(bundle.getString("invalidPhone")).append("\n");
         }
 
         if(invalidPostalCode()){
-            errorList.append(" - Please enter a valid Postal Code.\n");
+            errorList.append(bundle.getString("invalidPostalCode")).append("\n");
         }
 
         if(invalidDivision()){
-            errorList.append(" - Please select a Division.\n");
+            errorList.append(bundle.getString("invalidDivision")).append("\n");
         }
 
         if(invalidCountry()){
-            errorList.append(" - Please select a Country.\n");
+            errorList.append(bundle.getString("invalidCountry")).append("\n");
         }
         return errorList;
     }
@@ -229,25 +271,49 @@ public class ModifyCustomerController {
         this.scene = scene;
     };
 
+    /**
+     * Is the name invalid?
+     * @return true if invalid
+     */
     private boolean invalidName(){
         return customerName.getText().isEmpty();
     }
 
+    /**
+     * Is the phone number invalid?
+     * @return true if invalid
+     */
     private boolean invalidPhoneNumber(){
         return tfPhone.getText().isEmpty();
     }
 
+    /**
+     * Is the address invalid?
+     * @return true if invalid
+     */
     private boolean invalidAddress(){
         return address.getText().isEmpty();
     }
 
+    /**
+     * Is the postal code invalid?
+     * @return true if invalid
+     */
     private boolean invalidPostalCode(){
         return postalCode.getText().isEmpty();
     }
 
+    /**
+     * Is the division selected?
+     * @return true if not selected
+     */
     private boolean invalidDivision(){
-        return cbDivision.getSelectionModel().isEmpty();
+        return cbDivision.getItems().size() > 0 && cbDivision.getSelectionModel().isEmpty();
     }
 
+    /**
+     * Is the country selected?
+     * @return true if not selected
+     */
     private boolean invalidCountry() { return cbCountry.getSelectionModel().isEmpty();}
 }
