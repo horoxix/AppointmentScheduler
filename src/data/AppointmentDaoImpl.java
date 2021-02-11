@@ -8,6 +8,7 @@ import models.User;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import java.sql.*;
+import java.time.ZoneId;
 import java.util.Optional;
 
 public class AppointmentDaoImpl implements Dao<Appointment> {
@@ -66,8 +67,8 @@ public class AppointmentDaoImpl implements Dao<Appointment> {
                             resultSet.getString("Description"),
                             resultSet.getString("Location"),
                             resultSet.getString("Type"),
-                            TimeService.convertToLocalDateTimeString(resultSet.getTimestamp("Start").toString()),
-                            TimeService.convertToLocalDateTimeString(resultSet.getTimestamp("End").toString()),
+                            TimeService.convertToLocalDateTimeString(resultSet.getTimestamp("Start").toString(), ZoneId.systemDefault()),
+                            TimeService.convertToLocalDateTimeString(resultSet.getTimestamp("End").toString(), ZoneId.systemDefault()),
                             resultSet.getInt("Customer_ID"),
                             resultSet.getInt("Contact_ID")
                     ));
@@ -101,8 +102,8 @@ public class AppointmentDaoImpl implements Dao<Appointment> {
                         resultSet.getString("Description"),
                         resultSet.getString("Location"),
                         resultSet.getString("Type"),
-                        TimeService.convertToLocalDateTimeString(resultSet.getTimestamp("Start").toString()),
-                        TimeService.convertToLocalDateTimeString(resultSet.getTimestamp("End").toString()),
+                        TimeService.convertToLocalDateTimeString(resultSet.getTimestamp("Start").toString(), ZoneId.systemDefault()),
+                        TimeService.convertToLocalDateTimeString(resultSet.getTimestamp("End").toString(), ZoneId.systemDefault()),
                         resultSet.getInt("Customer_ID"),
                         resultSet.getInt("Contact_ID")
                 );
@@ -135,8 +136,8 @@ public class AppointmentDaoImpl implements Dao<Appointment> {
             preparedStatement.setString(3, appointment.getDescription());
             preparedStatement.setString(4, appointment.getLocation());
             preparedStatement.setString(5, appointment.getType());
-            preparedStatement.setTimestamp(6, TimeService.convertToUtcTimestamp(appointment.getStartTime()));
-            preparedStatement.setTimestamp(7, TimeService.convertToUtcTimestamp(appointment.getEndTime()));
+            preparedStatement.setTimestamp(6, TimeService.convertToUtcTimestamp(appointment.getStartTime(), ZoneId.systemDefault()));
+            preparedStatement.setTimestamp(7, TimeService.convertToUtcTimestamp(appointment.getEndTime(), ZoneId.systemDefault()));
             preparedStatement.setString(8, user.getUserName());
             preparedStatement.setString(9, user.getUserName());
             preparedStatement.setInt(10, appointment.getCustomerId());
@@ -176,8 +177,8 @@ public class AppointmentDaoImpl implements Dao<Appointment> {
             preparedStatement.setString(2, appointment.getDescription());
             preparedStatement.setString(3, appointment.getLocation());
             preparedStatement.setString(4, appointment.getType());
-            preparedStatement.setTimestamp(5, TimeService.convertToUtcTimestamp(appointment.getStartTime()));
-            preparedStatement.setTimestamp(6, TimeService.convertToUtcTimestamp(appointment.getEndTime()));
+            preparedStatement.setTimestamp(5, TimeService.convertToUtcTimestamp(appointment.getStartTime(), ZoneId.systemDefault()));
+            preparedStatement.setTimestamp(6, TimeService.convertToUtcTimestamp(appointment.getEndTime(), ZoneId.systemDefault()));
             preparedStatement.setString(7, user.getUserName());
             preparedStatement.setInt(8, appointment.getCustomerId());
             preparedStatement.setInt(9, user.getId());

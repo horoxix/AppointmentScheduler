@@ -14,6 +14,7 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import util.Helper;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -103,6 +104,7 @@ public class ModifyAppointmentController {
         tfAppointmentId.setText(String.valueOf(appointment.getId()));
         tfTitle.setText(appointment.getTitle());
         taDescription.setText(appointment.getDescription());
+        tfLocation.setText(appointment.getLocation());
 
         // Populate start and end date/time
         dpStart.setValue(TimeService.convertToLocalDate(appointment.getStartTime()));
@@ -119,7 +121,7 @@ public class ModifyAppointmentController {
 
         contact.ifPresent(value -> cbContact.getSelectionModel().select(value));
 
-        cbContact.getSelectionModel().select(appointment.getContact());
+        //cbContact.getSelectionModel().select(appointment.getContact());
 
         Optional<Customer> customer = cbCustomer
                 .getItems()
@@ -203,10 +205,12 @@ public class ModifyAppointmentController {
                     appointment.setLocation(tfLocation.getText());
                     appointment.setStartTime(TimeService.convertToLocalDateTimeString(
                             dpStart.getValue(),
-                            cbStartTime.getSelectionModel().getSelectedItem()));
+                            cbStartTime.getSelectionModel().getSelectedItem()
+                            , ZoneId.systemDefault()));
                     appointment.setEndTime(TimeService.convertToLocalDateTimeString(
                                     dpEnd.getValue(),
-                                    cbEndTime.getSelectionModel().getSelectedItem()));
+                                    cbEndTime.getSelectionModel().getSelectedItem(),
+                            ZoneId.systemDefault()));
 
                     appointmentDao.update(appointment);
                     closeWindow();
@@ -323,7 +327,7 @@ public class ModifyAppointmentController {
      * @return true if not selected
      */
     private boolean invalidType(){
-        return cbType.getSelectionModel().isEmpty();
+        return cbType.getSelectionModel().getSelectedIndex() == -1;
     }
 
     /**
@@ -331,7 +335,7 @@ public class ModifyAppointmentController {
      * @return true if not selected
      */
     private boolean invalidCustomer(){
-        return cbCustomer.getSelectionModel().isEmpty();
+        return cbCustomer.getSelectionModel().getSelectedIndex() == -1;
     }
 
     /**
@@ -339,7 +343,7 @@ public class ModifyAppointmentController {
      * @return true if not selected
      */
     private boolean invalidContact(){
-        return cbContact.getSelectionModel().isEmpty();
+        return cbContact.getSelectionModel().getSelectedIndex() == -1;
     }
 
     /**
@@ -350,14 +354,17 @@ public class ModifyAppointmentController {
     private boolean invalidDateTime(){
         if(        dpEnd.getValue() == null
                 || dpStart.getValue() == null
-                || cbStartTime.getSelectionModel().isEmpty()
-                || cbEndTime.getSelectionModel().isEmpty()) {
+                || cbStartTime.getSelectionModel().getSelectedIndex() == -1
+                || cbEndTime.getSelectionModel().getSelectedIndex() == -1) {
             return true;
         }
-        else if(dpEnd.getValue() == dpStart.getValue()
-                && TimeService.getLocalTimeFromString(cbStartTime.getValue())
-                .isAfter(TimeService.getLocalTimeFromString(cbEndTime.getValue()))){
-            return true;
+        else if(dpEnd.getValue().equals(dpStart.getValue())){
+            if(cbStartTime.getValue().equals(cbEndTime.getValue())
+                    || TimeService.getLocalTimeFromString(cbStartTime.getValue())
+                    .isAfter(TimeService.getLocalTimeFromString(cbEndTime.getValue()))){
+                return true;
+            }
+            return dpStart.getValue().isAfter(dpEnd.getValue());
         }
         else return dpStart.getValue().isAfter(dpEnd.getValue());
     }
@@ -367,8 +374,8 @@ public class ModifyAppointmentController {
      * @return true if invalid
      */
     private boolean invalidBusinessHours() {
-        return TimeService.outOfBusinessHours(dpStart.getValue(), cbStartTime.getValue())
-                || TimeService.outOfBusinessHours(dpEnd.getValue(), cbEndTime.getValue());
+        return TimeService.outOfBusinessHours(dpStart.getValue(), cbStartTime.getValue(), ZoneId.systemDefault())
+                || TimeService.outOfBusinessHours(dpEnd.getValue(), cbEndTime.getValue(), ZoneId.systemDefault());
     }
 
     /**
@@ -377,14 +384,20 @@ public class ModifyAppointmentController {
      */
     private boolean appointmentHasConflict(){
         for(Appointment app : appointments){
-            ZonedDateTime startTime = TimeService.convertToBusinessHoursZonedDateTime(app.getStartTime());
-            ZonedDateTime endTime = TimeService.convertToBusinessHoursZonedDateTime(app.getEndTime());
-            ZonedDateTime newStartTime = TimeService.convertToBusinessHoursZonedDateTime(dpStart.getValue(), cbStartTime.getValue());
-            ZonedDateTime newEndTime = TimeService.convertToBusinessHoursZonedDateTime(dpEnd.getValue(), cbEndTime.getValue());
 
-            if(newStartTime.isAfter(startTime) && newStartTime.isBefore(endTime)
-                    || newEndTime.isBefore(endTime) && newEndTime.isAfter(startTime)){
-                return true;
+            if(app.getId() != appointment.getId()){
+                ZonedDateTime oldStartTime = TimeService.convertToBusinessHoursZonedDateTime(app.getStartTime(), ZoneId.systemDefault());
+                ZonedDateTime oldEndTime = TimeService.convertToBusinessHoursZonedDateTime(app.getEndTime(), ZoneId.systemDefault());
+                ZonedDateTime newStartTime = TimeService.convertToBusinessHoursZonedDateTime(dpStart.getValue(), cbStartTime.getValue(), ZoneId.systemDefault());
+                ZonedDateTime newEndTime = TimeService.convertToBusinessHoursZonedDateTime(dpEnd.getValue(), cbEndTime.getValue(), ZoneId.systemDefault());
+
+                if ((newStartTime.isAfter(oldStartTime) || newStartTime.isEqual(oldStartTime)) && (newStartTime.isBefore(oldEndTime))){
+                    return true;
+                }
+
+                if (newEndTime.isAfter(oldStartTime) && (newEndTime.isBefore(oldEndTime) || newEndTime.isEqual(oldEndTime))){
+                    return true;
+                }
             }
         }
         return false;

@@ -15,7 +15,6 @@ public class TimeService {
     public static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     public static final DateTimeFormatter dateTimeFormatter12Hour = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm a");
     public static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm a");
-    public static final ZoneId zoneId = ZoneId.systemDefault();
     private static final ZoneId zoneIdUtc = ZoneId.of("UTC");
     private static final ZoneId zoneIdEst = ZoneId.of("America/New_York");
     private static final ValueRange businessHourRange = ValueRange.of(8, 22);
@@ -43,7 +42,7 @@ public class TimeService {
      * @param dateString dateTime string to convert.
      * @return ZonedDateTime object
      */
-    public static ZonedDateTime convertToZonedDateTime(String dateString){
+    public static ZonedDateTime convertToZonedDateTime(String dateString, ZoneId zoneId){
         LocalDateTime date = LocalDateTime.parse(dateString, dateTimeFormatter12Hour);
         return date.atZone(zoneId).withZoneSameInstant(zoneId);
     }
@@ -53,7 +52,7 @@ public class TimeService {
      * @param dateString dateTime string to convert.
      * @return EST ZonedDateTime object
      */
-    public static ZonedDateTime convertToBusinessHoursZonedDateTime(String dateString){
+    public static ZonedDateTime convertToBusinessHoursZonedDateTime(String dateString, ZoneId zoneId){
         LocalDateTime date = LocalDateTime.parse(dateString, dateTimeFormatter12Hour);
         return date.atZone(zoneId).withZoneSameInstant(zoneIdEst);
     }
@@ -64,7 +63,7 @@ public class TimeService {
      * @param time String of the time selected
      * @return EST ZonedDateTime object
      */
-    public static ZonedDateTime convertToBusinessHoursZonedDateTime(LocalDate localDate, String time){
+    public static ZonedDateTime convertToBusinessHoursZonedDateTime(LocalDate localDate, String time, ZoneId zoneId){
         LocalTime localStartTime = LocalTime.parse(time, shortTime);
         LocalDateTime localDateTime = LocalDateTime.of(localDate, localStartTime);
         return localDateTime.atZone(zoneId).withZoneSameInstant(zoneIdEst);
@@ -76,7 +75,7 @@ public class TimeService {
      * @param time String of the time selected
      * @return true if falls out of business hour range.
      */
-    public static boolean outOfBusinessHours(LocalDate localDate, String time){
+    public static boolean outOfBusinessHours(LocalDate localDate, String time, ZoneId zoneId){
         LocalTime localStartTime = LocalTime.parse(time, shortTime);
         LocalDateTime localDateTime = LocalDateTime.of(localDate, localStartTime);
         ZonedDateTime zonedDateTime = localDateTime.atZone(zoneId).withZoneSameInstant(zoneIdEst);
@@ -88,7 +87,7 @@ public class TimeService {
      * @param timeString String of time to convert
      * @return Timestamp object to save to database
      */
-    public static Timestamp convertToUtcTimestamp(String timeString){
+    public static Timestamp convertToUtcTimestamp(String timeString, ZoneId zoneId){
         LocalDateTime localDateTime = LocalDateTime.parse(timeString, dateTimeFormatter12Hour);
         ZonedDateTime zonedDateTime = localDateTime.atZone(zoneId).withZoneSameInstant(zoneIdUtc);
         return Timestamp.valueOf(zonedDateTime.toLocalDateTime());
@@ -99,7 +98,7 @@ public class TimeService {
      * @param dateString dateTime string to convert.
      * @return ZonedDateTime object
      */
-    public static String convertToLocalDateTimeString(String dateString){
+    public static String convertToLocalDateTimeString(String dateString, ZoneId zoneId){
         LocalDateTime date = LocalDateTime.parse(dateString.substring(0, 19), dateTimeFormatter);
         ZonedDateTime zonedDateTime = date.atZone(zoneIdUtc).withZoneSameInstant(zoneId);
         return zonedDateTime.format(dateTimeFormatter12Hour);
@@ -111,7 +110,7 @@ public class TimeService {
      * @param time String of the time selected
      * @return ZonedDateTime object
      */
-    public static String convertToLocalDateTimeString(LocalDate date, String time){
+    public static String convertToLocalDateTimeString(LocalDate date, String time, ZoneId zoneId){
         LocalTime localStartTime = LocalTime.parse(time, shortTime);
         LocalDateTime localDateTime = LocalDateTime.of(date, localStartTime);
         ZonedDateTime zonedDateTime = localDateTime.atZone(zoneId);
@@ -132,7 +131,7 @@ public class TimeService {
      * @param date ZonedDateTime to check
      * @return true if ZonedDateTime is within current month
      */
-    public static Boolean isCurrentMonth(ZonedDateTime date) {
+    public static Boolean isCurrentMonth(ZonedDateTime date, ZoneId zoneId) {
         YearMonth currentMonth = YearMonth.now(zoneId);
         return currentMonth.equals(YearMonth.from(date));
     }
@@ -142,7 +141,7 @@ public class TimeService {
      * @param date ZonedDateTime to check
      * @return true if ZonedDateTime is within current week
      */
-    public static Boolean isCurrentWeek(ZonedDateTime date){
+    public static Boolean isCurrentWeek(ZonedDateTime date, ZoneId zoneId){
         DayOfWeek firstDay = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
         ZonedDateTime firstDayTime = ZonedDateTime.now(zoneId).with(TemporalAdjusters.previousOrSame(firstDay));
         DayOfWeek lastDay = DayOfWeek.of(((firstDay.getValue()  + 5) % DayOfWeek.values().length) + 1);

@@ -16,6 +16,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import util.Helper;
+
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -254,7 +256,7 @@ public class HomeController {
     private void loadMonthlyAppointments(){
         tvAppointments.setItems(appointments
                 .stream()
-                .filter(app -> (TimeService.isCurrentMonth(TimeService.convertToZonedDateTime(app.getStartTime()))))
+                .filter(app -> (TimeService.isCurrentMonth(TimeService.convertToZonedDateTime(app.getStartTime(), ZoneId.systemDefault()), ZoneId.systemDefault())))
                 .collect(Collectors.toCollection(FXCollections::observableArrayList)));
     }
 
@@ -265,7 +267,7 @@ public class HomeController {
     private void loadWeeklyAppointments(){
         tvAppointments.setItems(appointments
                 .stream()
-                .filter(app -> (TimeService.isCurrentWeek(TimeService.convertToZonedDateTime(app.getStartTime()))))
+                .filter(app -> (TimeService.isCurrentWeek(TimeService.convertToZonedDateTime(app.getStartTime(), ZoneId.systemDefault()), ZoneId.systemDefault())))
                 .collect(Collectors.toCollection(FXCollections::observableArrayList)));
     }
 
@@ -277,7 +279,7 @@ public class HomeController {
     public void checkForUpcomingAppointments(){
         StringBuilder sb = new StringBuilder();
         for(Appointment app : appointments){
-            ZonedDateTime zd = TimeService.convertToZonedDateTime(app.getStartTime());
+            ZonedDateTime zd = TimeService.convertToZonedDateTime(app.getStartTime(), ZoneId.systemDefault());
             if(zd.isAfter(ZonedDateTime.now()) && zd.isBefore(ZonedDateTime.now().plusMinutes(15))){
                 upcomingAppointments.add(app);
                 sb.append(app.getId())
@@ -497,6 +499,14 @@ public class HomeController {
                     customers.remove(customer);
 
                     tvCustomers.refresh();
+
+                    Alert deleteAlert = new Alert(Alert.AlertType.INFORMATION,
+                            customer.getId()
+                                    + " - "
+                                    + customer.getName()
+                                    + " deleted successfully.",
+                            ButtonType.OK);
+                    deleteAlert.show();
                 }
             }
         }
@@ -523,7 +533,7 @@ public class HomeController {
             }
             else {
                 Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION,
-                        bundle.getString("delete") + " " + appointment.getTitle() + "?",
+                        bundle.getString("delete") + " " + appointment.getId() + " - " + appointment.getType() + " - " + appointment.getTitle() + "?",
                         ButtonType.YES,
                         ButtonType.NO,
                         ButtonType.CANCEL);
@@ -540,6 +550,15 @@ public class HomeController {
                     }
 
                     tvAppointments.refresh();
+                    Alert deleteAlert = new Alert(Alert.AlertType.INFORMATION,
+                            appointment.getId()
+                                    + " - "
+                                    + appointment.getType()
+                                    + " - "
+                                    + appointment.getTitle()
+                                    + " cancelled successfully.",
+                            ButtonType.OK);
+                    deleteAlert.show();
                 }
             }
         }
